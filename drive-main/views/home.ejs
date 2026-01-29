@@ -1,0 +1,1061 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - CloudDrive</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.4.0/fonts/remixicon.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            background: #0a0a0f;
+        }
+
+        /* Animated Background */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: linear-gradient(125deg, #0a0a0f 0%, #1a1a2e 25%, #16213e 50%, #0f3460 75%, #0a0a0f 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 20s ease infinite;
+        }
+
+        @keyframes gradientShift {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 280px;
+            height: 100vh;
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid rgba(255, 255, 255, 0.06);
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+        }
+
+        .sidebar-scrollable {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            padding-right: 4px;
+        }
+
+        .sidebar-scrollable::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .sidebar-scrollable::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 40px;
+            padding: 0 10px;
+        }
+
+        .logo-icon {
+            width: 46px;
+            height: 46px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3);
+        }
+
+        .logo-icon i {
+            font-size: 24px;
+            color: white;
+        }
+
+        .logo-text {
+            font-size: 24px;
+            font-weight: 800;
+            color: white;
+            letter-spacing: -0.5px;
+        }
+
+        .nav-section {
+            margin-bottom: 30px;
+        }
+
+        .nav-title {
+            font-size: 11px;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.45);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            padding: 0 16px;
+            margin-bottom: 12px;
+            opacity: 0.8;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 16px;
+            border-radius: 12px;
+            color: rgba(255, 255, 255, 0.6);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            margin-bottom: 4px;
+            cursor: pointer;
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.06);
+            color: white;
+        }
+
+        .nav-item.active {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.25) 0%, rgba(118, 75, 162, 0.25) 100%);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .nav-item i {
+            font-size: 20px;
+        }
+
+        .nav-item.logout {
+            color: rgba(255, 100, 100, 0.7);
+        }
+
+        .nav-item.logout:hover {
+            background: rgba(255, 100, 100, 0.1);
+            color: #ff6b6b;
+        }
+
+        .storage-section {
+            margin-top: auto;
+            margin-bottom: 20px;
+            padding: 24px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .storage-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 14px;
+        }
+
+        .storage-bar {
+            height: 8px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 12px;
+        }
+
+        .storage-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 10px;
+            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .storage-text {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 280px;
+            padding: 30px 40px;
+            min-height: 100vh;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 48px;
+            width: 100%;
+            background: transparent;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .page-title {
+            font-size: 32px;
+            font-weight: 800;
+            color: white;
+            letter-spacing: -0.5px;
+            flex-shrink: 1;
+            min-width: 200px;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-shrink: 0;
+        }
+
+        .upload-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 28px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 14px;
+            color: white;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3);
+        }
+
+        .upload-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 32px rgba(102, 126, 234, 0.4);
+        }
+
+        .upload-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .upload-btn i {
+            font-size: 20px;
+        }
+
+        /* Files Grid */
+        .files-section {
+            margin-top: 20px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: white;
+        }
+
+        .file-count {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.5);
+            background: rgba(255, 255, 255, 0.05);
+            padding: 6px 14px;
+            border-radius: 20px;
+        }
+
+        .files-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 20px;
+        }
+
+        .file-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            border-radius: 18px;
+            padding: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .file-card:hover {
+            background: rgba(255, 255, 255, 0.06);
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px -20px rgba(0, 0, 0, 0.5);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .file-icon {
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .file-icon i {
+            font-size: 26px;
+            color: #a78bfa;
+        }
+
+        .file-icon.pdf {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(220, 38, 38, 0.2));
+        }
+
+        .file-icon.pdf i {
+            color: #f87171;
+        }
+
+        .file-icon.image {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(37, 99, 235, 0.2));
+        }
+
+        .file-icon.image i {
+            color: #60a5fa;
+        }
+
+        .file-icon.doc {
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.2), rgba(22, 163, 74, 0.2));
+        }
+
+        .file-icon.doc i {
+            color: #4ade80;
+        }
+
+        .file-info {
+            flex: 1;
+            min-width: 0;
+            margin-right: 12px;
+        }
+
+        .file-name {
+            font-size: 15px;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 4px;
+            display: block;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            width: 100%;
+        }
+
+        .file-meta {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.4);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .file-meta i {
+            font-size: 14px;
+            opacity: 0.7;
+        }
+
+        .file-actions {
+            display: flex;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+
+        .action-btn {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            border: none;
+            background: rgba(255, 255, 255, 0.06);
+            color: rgba(255, 255, 255, 0.6);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+        }
+
+        .action-btn:hover {
+            background: rgba(102, 126, 234, 0.2);
+            color: white;
+        }
+
+        .action-btn.delete:hover {
+            background: rgba(239, 68, 68, 0.2);
+            color: #f87171;
+        }
+
+        .action-btn i {
+            font-size: 18px;
+        }
+
+        .action-btn.active i {
+            color: #fbbf24 !important;
+            filter: drop-shadow(0 0 12px rgba(251, 191, 36, 0.5));
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 100px 20px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 24px;
+            border: 2px dashed rgba(255, 255, 255, 0.08);
+        }
+
+        .empty-icon {
+            width: 100px;
+            height: 100px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 28px;
+        }
+
+        .empty-icon i {
+            font-size: 42px;
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        .empty-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 10px;
+        }
+
+        .empty-text {
+            color: rgba(255, 255, 255, 0.4);
+            margin-bottom: 28px;
+            font-size: 15px;
+        }
+
+        /* Upload Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(12px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: rgba(15, 15, 25, 0.98);
+            border-radius: 32px;
+            padding: 48px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            box-shadow: 0 40px 80px rgba(0, 0, 0, 0.6);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+            overflow-y: auto;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 24px;
+            right: 24px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: none;
+            background: rgba(255, 255, 255, 0.05);
+            color: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+        }
+
+        .modal-close:hover {
+            background: rgba(255, 100, 100, 0.15);
+            color: #ff6b6b;
+        }
+
+        .modal-title {
+            font-size: 28px;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 32px;
+            text-align: center;
+            letter-spacing: -0.5px;
+        }
+
+        .dropzone {
+            width: 100%;
+            border: 2px dashed rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 50px 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 32px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .dropzone:hover,
+        .dropzone.dragover {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.08);
+        }
+
+        .dropzone i {
+            font-size: 52px;
+            color: rgba(255, 255, 255, 0.35);
+            margin-bottom: 20px;
+        }
+
+        .dropzone-text {
+            font-size: 17px;
+            color: white;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+
+        .dropzone-hint {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .modal-submit {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 14px;
+            color: white;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+
+        .modal-submit:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 32px rgba(102, 126, 234, 0.4);
+        }
+
+        .modal-submit:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .toast {
+            background: rgba(30, 30, 45, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 14px;
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            color: white;
+            font-size: 14px;
+            font-weight: 500;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+            animation: slideIn 0.3s ease;
+        }
+
+        .toast.success i {
+            color: #4ade80;
+        }
+
+        .toast.error i {
+            color: #f87171;
+        }
+
+        .toast i {
+            font-size: 20px;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Delete Confirmation Modal */
+        .confirm-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(8px);
+            z-index: 1001;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .confirm-modal.active {
+            display: flex;
+        }
+
+        .confirm-box {
+            background: rgba(30, 30, 50, 0.98);
+            border-radius: 20px;
+            padding: 32px;
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .confirm-icon {
+            width: 64px;
+            height: 64px;
+            background: rgba(239, 68, 68, 0.15);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+        }
+
+        .confirm-icon i {
+            font-size: 28px;
+            color: #f87171;
+        }
+
+        .confirm-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 10px;
+        }
+
+        .confirm-text {
+            color: rgba(255, 255, 255, 0.5);
+            margin-bottom: 28px;
+            font-size: 14px;
+        }
+
+        .confirm-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .confirm-btn {
+            flex: 1;
+            padding: 14px;
+            border-radius: 12px;
+            border: none;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .confirm-btn.cancel {
+            background: rgba(255, 255, 255, 0.06);
+            color: white;
+        }
+
+        .confirm-btn.cancel:hover {
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .confirm-btn.delete {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+        }
+
+        .confirm-btn.delete:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(239, 68, 68, 0.3);
+        }
+
+        @media (max-width: 1100px) {
+            .sidebar {
+                transform: translateX(-100%);
+                width: 260px;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 24px;
+            }
+
+            .files-grid {
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="bg-animation"></div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="logo">
+            <div class="logo-icon">
+                <i class="ri-cloud-line"></i>
+            </div>
+            <span class="logo-text">CloudDrive</span>
+        </div>
+
+        <div class="sidebar-scrollable">
+            <nav class="nav-section">
+                <div class="nav-title">Main</div>
+                <a href="/home" class="nav-item <%= filter === 'all' || !filter ? 'active' : '' %>">
+                    <i class="ri-dashboard-line"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/home?filter=all" class="nav-item">
+                    <i class="ri-folder-line"></i>
+                    <span>My Files</span>
+                </a>
+                <a href="/home?filter=favorites" class="nav-item <%= filter === 'favorites' ? 'active' : '' %>">
+                    <i class="ri-star-line"></i>
+                    <span>Favorites</span>
+                </a>
+                <a href="/home?filter=recent" class="nav-item <%= filter === 'recent' ? 'active' : '' %>">
+                    <i class="ri-time-line"></i>
+                    <span>Recent</span>
+                </a>
+            </nav>
+
+            <nav class="nav-section">
+                <div class="nav-title">Account</div>
+                <a href="#" class="nav-item">
+                    <i class="ri-settings-3-line"></i>
+                    <span>Settings</span>
+                </a>
+                <a href="/logout" class="nav-item logout">
+                    <i class="ri-logout-box-line"></i>
+                    <span>Logout</span>
+                </a>
+            </nav>
+        </div>
+
+        <div class="storage-section">
+            <div class="storage-title">Storage Used</div>
+            <div class="storage-bar">
+                <div class="storage-fill" style="width: <%= Math.min((files.length / 15) * 100, 100) %>%"></div>
+            </div>
+            <div class="storage-text">
+                <%= files ? files.length : 0 %> / 15 files uploaded
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <header class="header">
+            <h1 class="page-title">
+                <%= filter==='favorites' ? 'Favorite Files' : (filter==='recent' ? 'Recent Files' : 'My Files' ) %>
+            </h1>
+            <div class="header-actions">
+                <button class="upload-btn" onclick="showModal()" id="uploadTrigger">
+                    <i class="ri-upload-cloud-2-line"></i>
+                    Upload File
+                </button>
+            </div>
+        </header>
+
+        <section class="files-section">
+            <div class="section-header" style="margin-bottom: 32px;">
+                <span class="file-count">
+                    <%= files ? files.length : 0 %> total files
+                </span>
+            </div>
+
+            <% if (files && files.length> 0) { %>
+                <div class="files-grid">
+                    <% files.forEach((file)=> {
+                        const ext = file.originalname.split('.').pop().toLowerCase();
+                        let iconClass = '';
+                        let icon = 'ri-file-3-line';
+                        if (['pdf'].includes(ext)) { iconClass = 'pdf'; icon = 'ri-file-pdf-2-line'; }
+                        else if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'].includes(ext)) { iconClass = 'image'; icon
+                        = 'ri-image-line'; }
+                        else if (['doc', 'docx', 'txt'].includes(ext)) { iconClass = 'doc'; icon = 'ri-file-text-line';
+                        }
+                        %>
+                        <div class="file-card">
+                            <div class="file-icon <%= iconClass %>">
+                                <i class="<%= icon %>"></i>
+                            </div>
+                            <div class="file-info">
+                                <div class="file-name" title="<%= file.originalname %>">
+                                    <%= file.originalname %>
+                                </div>
+                                <div class="file-meta">
+                                    <i class="ri-calendar-line"></i>
+                                    <%= new Date(file.createdAt).toLocaleDateString('en-US', { month: 'short' ,
+                                        day: 'numeric' , year: 'numeric' }) %>
+                                </div>
+                            </div>
+                            <div class="file-actions">
+                                <button class="action-btn <%= file.isFavorite ? 'active' : '' %>"
+                                    onclick="toggleFavorite('<%= file._id %>')" title="Favorite">
+                                    <i class="<%= file.isFavorite ? 'ri-star-fill' : 'ri-star-line' %>"
+                                        style="<%= file.isFavorite ? 'color: #fbbf24' : '' %>"></i>
+                                </button>
+                                <a href="/download/<%= file.path %>" class="action-btn" title="Download">
+                                    <i class="ri-download-2-line"></i>
+                                </a>
+                                <button class="action-btn delete"
+                                    onclick="confirmDelete('<%= file.path %>', '<%= file.originalname %>')"
+                                    title="Delete">
+                                    <i class="ri-delete-bin-6-line"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <% }) %>
+                </div>
+                <% } else { %>
+                    <div class="empty-state">
+                        <div class="empty-icon">
+                            <i class="ri-folder-open-line"></i>
+                        </div>
+                        <h3 class="empty-title">No files uploaded yet</h3>
+                        <p class="empty-text">Click the upload button to add your first file</p>
+                        <button class="upload-btn" onclick="showModal()">
+                            <i class="ri-upload-cloud-2-line"></i>
+                            Upload File
+                        </button>
+                    </div>
+                    <% } %>
+        </section>
+    </main>
+
+    <!-- Upload Modal -->
+    <div class="modal-overlay" id="uploadModal">
+        <div class="modal">
+            <button class="modal-close" onclick="hideModal()">
+                <i class="ri-close-line"></i>
+            </button>
+            <h2 class="modal-title">Upload File</h2>
+            <form action="/upload" method="post" enctype="multipart/form-data" id="uploadForm">
+                <label class="dropzone" for="fileInput" id="dropzone">
+                    <i class="ri-upload-cloud-2-line"></i>
+                    <div class="dropzone-text" id="dropzoneText">Click to upload or drag and drop</div>
+                    <div class="dropzone-hint">Any file type supported</div>
+                    <input type="file" id="fileInput" name="file" style="display: none;" required>
+                </label>
+                <button type="submit" class="modal-submit" id="submitBtn">
+                    <span id="submitText">Upload File</span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="confirm-modal" id="deleteModal">
+        <div class="confirm-box">
+            <div class="confirm-icon">
+                <i class="ri-delete-bin-6-line"></i>
+            </div>
+            <h3 class="confirm-title">Delete File?</h3>
+            <p class="confirm-text" id="deleteFileName">This action cannot be undone.</p>
+            <div class="confirm-actions">
+                <button class="confirm-btn cancel" onclick="hideDeleteModal()">Cancel</button>
+                <form id="deleteForm" method="post" style="flex: 1;">
+                    <button type="submit" class="confirm-btn delete" style="width: 100%;">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Upload Modal
+        function showModal() {
+            document.getElementById('uploadModal').classList.add('active');
+        }
+
+        function hideModal() {
+            document.getElementById('uploadModal').classList.remove('active');
+            document.getElementById('dropzoneText').textContent = 'Click to upload or drag and drop';
+            document.getElementById('fileInput').value = '';
+        }
+
+        // Close modal on outside click
+        document.getElementById('uploadModal').addEventListener('click', function (e) {
+            if (e.target === this) hideModal();
+        });
+
+        // Show file name when selected
+        document.getElementById('fileInput').addEventListener('change', function (e) {
+            const fileName = e.target.files[0]?.name;
+            if (fileName) {
+                document.getElementById('dropzoneText').textContent = fileName;
+            }
+        });
+
+        // Drag and drop
+        const dropzone = document.getElementById('dropzone');
+        dropzone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropzone.classList.add('dragover');
+        });
+        dropzone.addEventListener('dragleave', () => {
+            dropzone.classList.remove('dragover');
+        });
+        dropzone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropzone.classList.remove('dragover');
+            if (e.dataTransfer.files.length) {
+                document.getElementById('fileInput').files = e.dataTransfer.files;
+                document.getElementById('dropzoneText').textContent = e.dataTransfer.files[0].name;
+            }
+        });
+
+        // Form submission with loading state
+        document.getElementById('uploadForm').addEventListener('submit', function () {
+            const btn = document.getElementById('submitBtn');
+            const text = document.getElementById('submitText');
+            btn.disabled = true;
+            text.innerHTML = '<div class="spinner"></div> Uploading...';
+        });
+
+        // Delete Confirmation
+        function confirmDelete(path, name) {
+            document.getElementById('deleteForm').action = '/delete/' + encodeURIComponent(path);
+            document.getElementById('deleteFileName').textContent = 'Delete "' + name + '"? This cannot be undone.';
+            document.getElementById('deleteModal').classList.add('active');
+        }
+
+        function hideDeleteModal() {
+            document.getElementById('deleteModal').classList.remove('active');
+        }
+
+        // Close delete modal on outside click
+        document.getElementById('deleteModal').addEventListener('click', function (e) {
+            if (e.target === this) hideDeleteModal();
+        });
+
+        // Toast notifications
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = 'toast ' + type;
+            toast.innerHTML = '<i class="' + (type === 'success' ? 'ri-check-line' : 'ri-error-warning-line') + '"></i>' + message;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 4000);
+        }
+
+        // Show toast if redirected with status
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('uploaded') === 'true') {
+            showToast('File uploaded successfully!');
+        }
+        if (urlParams.get('deleted') === 'true') {
+            showToast('File deleted successfully!');
+        }
+        // Toggle Favorite
+        async function toggleFavorite(fileId) {
+            try {
+                const response = await fetch('/favorite/' + fileId, { method: 'POST' });
+                const data = await response.json();
+                if (data.success) {
+                    location.reload(); // Simple reload to update UI
+                } else {
+                    showToast('Failed to update favorite', 'error');
+                }
+            } catch (err) {
+                console.error(err);
+                showToast('An error occurred', 'error');
+            }
+        }
+    </script>
+</body>
+
+</html>
